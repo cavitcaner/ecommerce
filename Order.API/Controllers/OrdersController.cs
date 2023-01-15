@@ -1,10 +1,10 @@
 ﻿using Events.Order;
 using Events.Payment;
 using MassTransit;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Order.API.Database;
 using Order.API.DTO;
-using Order.API.Order;
+using Order.API.Order.Database;
 
 namespace Order.API.Controllers
 {
@@ -24,7 +24,7 @@ namespace Order.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(OrderCreateDto orderRequest)
         {
-            var order = new Order.Order();
+            var order = new Order.Database.Order();
             order.CustomerId = orderRequest.CustomerId;
             order.Items = orderRequest.OrderItems.Select(x => new OrderItem
             {

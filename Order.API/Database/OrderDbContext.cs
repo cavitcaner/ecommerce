@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.ComponentModel.DataAnnotations;
+using Order.API.Order.Database;
 
-namespace Order.API.Order
+namespace Order.API.Database
 {
     public class OrderDbContext : DbContext
     {
@@ -10,7 +9,7 @@ namespace Order.API.Order
         {
         }
 
-        public DbSet<Order> Orders { get; set; }
+        public DbSet<Order.Database.Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
     }
 }

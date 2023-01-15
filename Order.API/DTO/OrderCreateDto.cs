@@ -1,8 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Order.API.Common;
-using Order.API.Order;
-
-namespace Order.API.DTO
+﻿namespace Order.API.DTO
 {
     public class OrderCreateDto
     {
@@ -10,7 +6,7 @@ namespace Order.API.DTO
         public string CustomerId { get; set; }
         public ICollection<OrderItemDto> OrderItems { get; set; } = new List<OrderItemDto>();
         public PaymentDto Payment { get; set; }
-        public Address Address { get; set; }
+        public AddressDto Address { get; set; }
 
     }
 }

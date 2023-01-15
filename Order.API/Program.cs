@@ -1,6 +1,6 @@
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
-using Order.API.Order;
+using Order.API.Database;
 
 var builder = WebApplication.CreateBuilder(args);
 

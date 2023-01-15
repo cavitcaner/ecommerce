@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
-namespace Order.API.Order
+namespace Order.API.Order.Database
 {
     [Owned]
     public class Address
