@@ -4,7 +4,6 @@ using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using Order.API.Database;
 using Order.API.DTO;
-using Order.API.Order.Database;
 
 namespace Order.API.Controllers
 {
@@ -24,7 +23,7 @@ namespace Order.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(OrderCreateDto orderRequest)
         {
-            var order = new Order.Database.Order();
+            var order = new Database.Order();
             order.CustomerId = orderRequest.CustomerId;
             order.Items = orderRequest.OrderItems.Select(x => new OrderItem
             {

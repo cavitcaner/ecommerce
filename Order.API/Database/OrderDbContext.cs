@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Order.API.Order.Database;
+using Order.API.Database;
 
 namespace Order.API.Database
 {
@@ -9,7 +9,7 @@ namespace Order.API.Database
         {
         }
 
-        public DbSet<Order.Database.Order> Orders { get; set; }
+        public DbSet<Database.Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
     }
 }

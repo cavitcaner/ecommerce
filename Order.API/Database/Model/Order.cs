@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Order.API.Common;
 
-namespace Order.API.Order.Database
+namespace Order.API.Database
 {
     public class Order
     {
