@@ -1,4 +1,4 @@
-﻿using Events.Payment;
+﻿using Common.Payment;
 
 namespace Events.Order
 {

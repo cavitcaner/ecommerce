@@ -1,5 +1,6 @@
-﻿using Events.Order;
-using Events.Payment;
+﻿using Common.Order;
+using Common.Payment;
+using Events.Order;
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using Order.API.Database;

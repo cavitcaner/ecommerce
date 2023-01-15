@@ -1,4 +1,4 @@
-﻿namespace Events.Payment
+﻿namespace Common.Payment
 {
     public class PaymentMessage
     {

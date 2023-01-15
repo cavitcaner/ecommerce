@@ -1,4 +1,4 @@
-﻿namespace Events.Order
+﻿namespace Common.Order
 {
     public class OrderItemMessage
     {
