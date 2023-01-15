@@ -1,3 +1,4 @@
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Order.API.Order;
 
@@ -9,6 +10,14 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddMassTransit(x =>
+{
+    x.UsingRabbitMq((ctx, cfg) =>
+    {
+        cfg.Host(builder.Configuration.GetConnectionString("RabbitMq"));
+    });
+});
+builder.Services.AddMassTransitHostedService();
 builder.Services.AddDbContext<OrderDbContext>(opts =>
 {
     opts.UseSqlServer(builder.Configuration.GetConnectionString("OrderDbConnection"));
