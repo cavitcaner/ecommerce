@@ -12,8 +12,8 @@ using Order.API.Database;
 namespace Order.API.Migrations
 {
     [DbContext(typeof(OrderDbContext))]
-    [Migration("20230115213142_OrderModelUpdated")]
-    partial class OrderModelUpdated
+    [Migration("20230116211814_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace Order.API.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Order.API.Order.Order", b =>
+            modelBuilder.Entity("Order.API.Database.Order", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -34,11 +34,15 @@ namespace Order.API.Migrations
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("CustomerEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CustomerId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("FailMessage")
+                    b.Property<string>("Message")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")
@@ -49,7 +53,7 @@ namespace Order.API.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("Order.API.Order.OrderItem", b =>
+            modelBuilder.Entity("Order.API.Database.OrderItem", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -60,10 +64,6 @@ namespace Order.API.Migrations
 
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ProductName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
@@ -79,9 +79,9 @@ namespace Order.API.Migrations
                     b.ToTable("OrderItems");
                 });
 
-            modelBuilder.Entity("Order.API.Order.Order", b =>
+            modelBuilder.Entity("Order.API.Database.Order", b =>
                 {
-                    b.OwnsOne("Order.API.Order.Address", "Address", b1 =>
+                    b.OwnsOne("Order.API.Database.Address", "Address", b1 =>
                         {
                             b1.Property<Guid>("OrderId")
                                 .HasColumnType("uniqueidentifier");
@@ -114,9 +114,9 @@ namespace Order.API.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Order.API.Order.OrderItem", b =>
+            modelBuilder.Entity("Order.API.Database.OrderItem", b =>
                 {
-                    b.HasOne("Order.API.Order.Order", "Order")
+                    b.HasOne("Order.API.Database.Order", "Order")
                         .WithMany("Items")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -125,7 +125,7 @@ namespace Order.API.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("Order.API.Order.Order", b =>
+            modelBuilder.Entity("Order.API.Database.Order", b =>
                 {
                     b.Navigation("Items");
                 });

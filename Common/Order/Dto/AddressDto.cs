@@ -1,4 +1,4 @@
-﻿namespace Order.API.DTO
+﻿namespace Common.Order.Dto
 {
     public class AddressDto
     {

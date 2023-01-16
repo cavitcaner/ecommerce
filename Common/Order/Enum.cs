@@ -1,4 +1,4 @@
-﻿namespace Order.API.Common
+﻿namespace Common.Order
 {
     public enum OrderStatus
     {

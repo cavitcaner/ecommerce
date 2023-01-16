@@ -1,10 +1,10 @@
 ﻿using Common.Order;
+using Common.Order.Dto;
 using Common.Payment;
-using Events.Order;
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Order.API.Database;
-using Order.API.DTO;
 
 namespace Order.API.Controllers
 {
@@ -22,14 +22,15 @@ namespace Order.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(OrderCreateDto orderRequest)
+        public async Task<IActionResult> Create(OrderDto orderRequest)
         {
             var order = new Database.Order();
+            order.Message = "Kontrol Ediliyor!";
             order.CustomerId = orderRequest.CustomerId;
+            order.CustomerEmail = orderRequest.CustomerEmail;
             order.Items = orderRequest.OrderItems.Select(x => new OrderItem
             {
                 ProductId = x.ProductId,
-                ProductName = x.ProductName,
                 Quantity = x.Quantity,
                 UnitPrice = x.UnitPrice,
                 OrderId = order.Id
@@ -49,6 +50,7 @@ namespace Order.API.Controllers
             var orderCreatedEvent = new OrderCreatedEvent()
             {
                 CustomerId = orderRequest.CustomerId,
+                CustomerEmail = orderRequest.CustomerEmail,
                 OrderId = order.Id,
                 Payment = new PaymentMessage
                 {
@@ -61,7 +63,8 @@ namespace Order.API.Controllers
                 orderItems = orderRequest.OrderItems.Select(x => new OrderItemMessage
                 {
                     Quantity = x.Quantity,
-                    ProductId = x.ProductId
+                    ProductId = x.ProductId,
+                    UnitPrice = x.UnitPrice
                 }).ToList()
             };
 
@@ -69,7 +72,47 @@ namespace Order.API.Controllers
             await _publishEndpoint.Publish(orderCreatedEvent);
 
 
-            return Ok();
+            return Accepted("/Orders", new { OrderId = order.Id });
+        }
+
+        [HttpGet("get/{orderId}")]
+        public async Task<IActionResult> GetOrder(Guid orderId)
+        {
+            var order = await _context.Orders.Where(x => x.Id == orderId)
+                .Select(x => new OrderResponseDto
+                {
+                    OrderId = x.Id,
+                    Status = x.Status,
+                    CustomerId = x.CustomerId,
+                    Message = x.Message,
+                    TotalPrice = x.Items.Sum(z => z.UnitPrice * z.Quantity)
+                })
+                .FirstOrDefaultAsync();
+
+            if (order == null)
+                return NotFound();
+
+            return Ok(order);
+        }
+     
+        [HttpGet("getall")]
+        public async Task<IActionResult> GetAllOrder()
+        {
+            var orders = await _context.Orders
+                .Select(x => new OrderResponseDto
+                {
+                    OrderId = x.Id,
+                    CustomerId = x.CustomerId,
+                    Status = x.Status,
+                    Message = x.Message,
+                    TotalPrice = x.Items.Sum(z => z.UnitPrice * z.Quantity)
+                })
+                .ToListAsync();
+
+            if (orders.Any() == false)
+                return NotFound();
+
+            return Ok(orders);
         }
     }
 }
