@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Order.API.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class initOrderDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

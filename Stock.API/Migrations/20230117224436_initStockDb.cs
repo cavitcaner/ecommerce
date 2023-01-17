@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Stock.API.Migrations
 {
     /// <inheritdoc />
-    public partial class stockDbInit : Migration
+    public partial class initStockDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,7 +19,7 @@ namespace Stock.API.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ProductName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UnitPrice = table.Column<int>(type: "int", nullable: false),
+                    UnitPrice = table.Column<double>(type: "float(18)", precision: 18, scale: 2, nullable: false),
                     UnitInStock = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>

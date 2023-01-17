@@ -12,8 +12,8 @@ using Stock.API.Database;
 namespace Stock.API.Migrations
 {
     [DbContext(typeof(StockDbContext))]
-    [Migration("20230115220741_stockDbInit")]
-    partial class stockDbInit
+    [Migration("20230117224436_initStockDb")]
+    partial class initStockDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -43,8 +43,9 @@ namespace Stock.API.Migrations
                     b.Property<int>("UnitInStock")
                         .HasColumnType("int");
 
-                    b.Property<int>("UnitPrice")
-                        .HasColumnType("int");
+                    b.Property<double>("UnitPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("float(18)");
 
                     b.HasKey("Id");
 

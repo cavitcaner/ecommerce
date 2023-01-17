@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Order.API.Database;
 
 namespace Order.API.Database
 {

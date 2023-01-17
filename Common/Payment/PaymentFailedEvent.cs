@@ -1,5 +1,4 @@
 ﻿using Common.Order;
-using Common.Order.Dto;
 
 namespace Common.Payment
 {

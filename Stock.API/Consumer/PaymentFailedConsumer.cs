@@ -1,35 +1,30 @@
-﻿using Common;
-using Common.Order;
-using Common.Payment;
+﻿using Common.Payment;
+using Common.Stock;
 using MassTransit;
-using MassTransit.Transports;
-using Microsoft.EntityFrameworkCore;
-using Stock.API.Database;
+using Stock.API.Business.Abstract;
 
 namespace Stock.API.Consumer
 {
     public class PaymentFailedConsumer : IConsumer<PaymentFailedEvent>
     {
-        private readonly StockDbContext _context;
+        private readonly IStockService _stockService;
+        private readonly IPublishEndpoint _publishEndpoint;
 
-        public PaymentFailedConsumer(StockDbContext context)
+        public PaymentFailedConsumer(IStockService stockService, IPublishEndpoint publishEndpoint)
         {
-            _context = context;
+            _stockService = stockService;
+            _publishEndpoint = publishEndpoint;
         }
 
         public async Task Consume(ConsumeContext<PaymentFailedEvent> context)
         {
-            var orderItemIdList = context.Message.OrderItems.Select(x => x.ProductId).ToList();
-            var stocks = await _context.Stocks.Where(x => orderItemIdList.Contains(x.ProductId)).ToListAsync();
+            await _stockService.StockIncreaseAsync(context.Message);
 
-            foreach (var item in context.Message.OrderItems)
+            await _publishEndpoint.Publish(new StockReversedByMessageEvent
             {
-                var stock = stocks.First(x => x.ProductId == item.ProductId);
-                item.ProductName = stock.ProductName;
-                stock.UnitInStock += item.Quantity;
-            }
-
-            await _context.SaveChangesAsync();
+                OrderId = context.Message.OrderId,
+                Message = context.Message.Message
+            });
         }
     }
 }

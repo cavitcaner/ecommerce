@@ -1,6 +1,4 @@
-﻿using Common.Order.Dto;
-
-namespace Invoice.API.Adapters
+﻿namespace Invoice.API.Adapters
 {
     public interface IMailAdapter
     {

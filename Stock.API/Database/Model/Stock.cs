@@ -7,7 +7,7 @@ namespace Stock.API.Database
     {
         [Key]
         public int Id { get; set; }
-        public Guid ProductId { get; set; } = Guid.NewGuid();
+        public Guid ProductId { get; set; }
         public string ProductName { get; set; }
         [Precision(18, 2)]
         public double UnitPrice { get; set; }

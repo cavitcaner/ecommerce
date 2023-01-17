@@ -1,7 +1,6 @@
 ﻿using Common.Stock.DTO;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Stock.API.Database;
+using Stock.API.Business.Abstract;
 
 namespace Stock.API.Controllers
 {
@@ -9,24 +8,17 @@ namespace Stock.API.Controllers
     [ApiController]
     public class StockController : Controller
     {
-        private readonly StockDbContext stockDbContext;
+        private readonly IStockService _stockService;
 
-        public StockController(StockDbContext stockDbContext)
+        public StockController(IStockService stockService)
         {
-            this.stockDbContext = stockDbContext;
+            _stockService = stockService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Stock()
         {
-            var stocks = await stockDbContext.Stocks.Select(x => new StockDto
-            {
-                StockCode = x.Id,
-                ProductId = x.ProductId,
-                ProductName = x.ProductName,
-                UnitPrice = x.UnitPrice,
-                UnitInStock = x.UnitInStock
-            }).ToListAsync();
+            List<StockDto> stocks = await _stockService.GetAllStocksAsync();
 
             return Ok(stocks);
         }

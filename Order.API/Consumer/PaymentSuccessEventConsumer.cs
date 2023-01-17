@@ -1,29 +1,22 @@
 ﻿using Common.Order;
 using Common.Payment;
 using MassTransit;
-using Microsoft.EntityFrameworkCore;
-using Order.API.Database;
+using Order.API.Business.Abstract;
 
 namespace Order.API.Consumer
 {
     public class PaymentSuccessEventConsumer : IConsumer<PaymentSuccessEvent>
     {
-        private readonly OrderDbContext _context;
+        private readonly IOrderService _orderService;
 
-        public PaymentSuccessEventConsumer(OrderDbContext orderDbContext)
+        public PaymentSuccessEventConsumer(IOrderService orderService)
         {
-            _context = orderDbContext;
+            _orderService = orderService;
         }
 
         public async Task Consume(ConsumeContext<PaymentSuccessEvent> context)
         {
-            var order = await _context.Orders.FirstAsync(x => x.Id == context.Message.OrderId);
-
-            order.Status = OrderStatus.Success;
-            order.Message = "Sipariş başarılı bir şekilde oluşturulmuştur.";
-
-            _context.Update(order);
-            await _context.SaveChangesAsync();
+            await _orderService.UpdateOrderStateAsync(context.Message.OrderId, OrderStatus.Success, "Sipariş başarılı bir şekilde oluşturulmuştur.");
         }
     }
 }

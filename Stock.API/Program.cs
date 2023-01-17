@@ -1,15 +1,19 @@
 using Common;
-using Common.Payment;
+using Common.Stock;
 using MassTransit;
-using MassTransit.Internals;
 using Microsoft.EntityFrameworkCore;
+using Stock.API.Business.Abstract;
 using Stock.API.Consumer;
 using Stock.API.Database;
-using static System.Net.Mime.MediaTypeNames;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddDbContext<StockDbContext>(opts =>
+{
+    opts.UseSqlServer(builder.Configuration.GetConnectionString("StockDbContext"));
+}, ServiceLifetime.Singleton);
+builder.Services.AddSingleton<IStockService, StockService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -37,27 +41,23 @@ builder.Services.AddMassTransit(x =>
 });
 builder.Services.AddMassTransitHostedService();
 
-builder.Services.AddDbContext<StockDbContext>(opts =>
+//inserting mock data
 {
-    opts.UseSqlServer(builder.Configuration.GetConnectionString("StockDbContext"));
-});
-
-using (ServiceProvider serviceProvider = builder.Services.BuildServiceProvider())
-{
-    //inserting mock data
     try
     {
+        using ServiceProvider serviceProvider = builder.Services.BuildServiceProvider();
+
         var context = serviceProvider.GetRequiredService<StockDbContext>();
         if (context.Stocks.FirstOrDefault() == null)
         {
-            var rand = new Random();
-            Enumerable.Range(1, 10).ToList().ForEach((x) =>
+            MockStock.Stocks.ForEach((x) =>
             {
                 _ = context.Add(new Stock.API.Database.Stock()
                 {
-                    ProductName = $"Product (" + x + ")",
-                    UnitInStock = rand.Next(1, 50),
-                    UnitPrice = rand.Next(150, 500),
+                    ProductId = x.ProductId,
+                    ProductName = x.ProductName,
+                    UnitInStock = x.UnitInStock,
+                    UnitPrice = x.UnitPrice,
                 });
             });
             context.SaveChangesAsync();
