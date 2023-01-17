@@ -22,7 +22,7 @@ namespace Order.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(OrderDto orderRequest)
+        public async Task<IActionResult> Orders(OrderDto orderRequest)
         {
             var order = new Database.Order();
             order.Message = "Kontrol Ediliyor!";
@@ -75,7 +75,27 @@ namespace Order.API.Controllers
             return Accepted("/Orders", new { OrderId = order.Id });
         }
 
-        [HttpGet("get/{orderId}")]
+        [HttpGet]
+        public async Task<IActionResult> Orders()
+        {
+            var orders = await _context.Orders
+                .Select(x => new OrderResponseDto
+                {
+                    OrderId = x.Id,
+                    CustomerId = x.CustomerId,
+                    Status = x.Status,
+                    Message = x.Message,
+                    TotalPrice = x.Items.Sum(z => z.UnitPrice * z.Quantity)
+                })
+                .ToListAsync();
+
+            if (orders.Any() == false)
+                return NotFound();
+
+            return Ok(orders);
+        }
+
+        [HttpGet("{orderId}")]
         public async Task<IActionResult> GetOrder(Guid orderId)
         {
             var order = await _context.Orders.Where(x => x.Id == orderId)
@@ -95,24 +115,5 @@ namespace Order.API.Controllers
             return Ok(order);
         }
      
-        [HttpGet("getall")]
-        public async Task<IActionResult> GetAllOrder()
-        {
-            var orders = await _context.Orders
-                .Select(x => new OrderResponseDto
-                {
-                    OrderId = x.Id,
-                    CustomerId = x.CustomerId,
-                    Status = x.Status,
-                    Message = x.Message,
-                    TotalPrice = x.Items.Sum(z => z.UnitPrice * z.Quantity)
-                })
-                .ToListAsync();
-
-            if (orders.Any() == false)
-                return NotFound();
-
-            return Ok(orders);
-        }
     }
 }

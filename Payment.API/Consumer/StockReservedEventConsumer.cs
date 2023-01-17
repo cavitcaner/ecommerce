@@ -6,30 +6,33 @@ namespace Payment.API.Consumer
 {
     public class StockReservedEventConsumer : IConsumer<StockReservedEvent>
     {
+        private readonly ISendEndpointProvider _sendEndpointProvider;
         private readonly IPublishEndpoint _publishEndpoint;
 
-        public StockReservedEventConsumer(IPublishEndpoint publishEndpoint)
+        public StockReservedEventConsumer(IPublishEndpoint publishEndpoint, ISendEndpointProvider sendEndpointProvider)
         {
             _publishEndpoint = publishEndpoint;
+            _sendEndpointProvider = sendEndpointProvider;
         }
 
         public async Task Consume(ConsumeContext<StockReservedEvent> context)
         {
-            Console.WriteLine("Ödeme başarılı bir şekilde alındı!");
-
             //test amaçlı yazılmıştır.
-            if(context.Message.Payment.CardName == "fail")
+            if (context.Message.Payment.CardName == "fail")
             {
-                await _publishEndpoint.Publish(new PaymentSuccessEvent
+                Console.WriteLine("Ödeme alınamadı!");
+
+                await _publishEndpoint.Publish(new PaymentFailedEvent
                 {
-                    CustomerEmail = context.Message.CustomerEmail,
                     OrderId = context.Message.OrderId,
-                    OrderItems = context.Message.OrderItems
+                    OrderItems = context.Message.OrderItems,
+                    Message = "Ödeme alırken hata oluştu. Kart bilgierinizi kontrol ediniz."
                 });
 
                 return;
             }
 
+            Console.WriteLine("Ödeme başarılı bir şekilde alındı!");
             await _publishEndpoint.Publish(new PaymentSuccessEvent
             {
                 CustomerEmail = context.Message.CustomerEmail,

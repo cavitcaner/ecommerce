@@ -4,11 +4,11 @@ using MassTransit;
 
 namespace Invoice.API.Consumer
 {
-    public class PaymentSuccessEventConsumer : IConsumer<PaymentSuccessEvent>
+    public class InvoicePaymentSuccessEventConsumer : IConsumer<PaymentSuccessEvent>
     {
         private readonly IMailAdapter _mailAdapter;
 
-        public PaymentSuccessEventConsumer(IMailAdapter mailAdapter)
+        public InvoicePaymentSuccessEventConsumer(IMailAdapter mailAdapter)
         {
             _mailAdapter = mailAdapter;
         }

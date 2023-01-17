@@ -1,4 +1,5 @@
 using Common;
+using Common.Payment;
 using MassTransit;
 using MassTransit.Internals;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,7 @@ builder.Services.AddLogging();
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<OrderCreatedEventConsumer>();
+    x.AddConsumer<PaymentFailedConsumer>();
 
     x.UsingRabbitMq((ctx, cfg) =>
     {
@@ -26,6 +28,10 @@ builder.Services.AddMassTransit(x =>
         cfg.ReceiveEndpoint(QueueConst.OrderCreatedEventQueueName, x =>
         {
             x.ConfigureConsumer<OrderCreatedEventConsumer>(ctx);
+        });
+        cfg.ReceiveEndpoint(QueueConst.StockPaymentFailedEventQueueName, x =>
+        {
+            x.ConfigureConsumer<PaymentFailedConsumer>(ctx);
         });
     });
 });

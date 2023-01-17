@@ -6,6 +6,6 @@ namespace Common.Payment
     {
         public Guid OrderId { get; set; }
         public string CustomerEmail { get; set; }
-        public List<OrderItemMessage> OrderItems { get; set; } = new List<OrderItemMessage>();
+        public List<OrderItemMessage> OrderItems { get; set; }
     }
 }

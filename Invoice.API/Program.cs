@@ -6,23 +6,23 @@ using MassTransit;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddTransient<IMailAdapter, MailAdapter>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddTransient<IMailAdapter, MailAdapter>();
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumer<PaymentSuccessEventConsumer>();
+    x.AddConsumer<InvoicePaymentSuccessEventConsumer>();
 
     x.UsingRabbitMq((ctx, cfg) =>
     {
         cfg.Host(builder.Configuration.GetConnectionString("RabbitMq"));
 
-        cfg.ReceiveEndpoint(QueueConst.PaymentSuccessEventQueueName, x =>
+        cfg.ReceiveEndpoint(QueueConst.InvoicePaymentSuccessEventName, x =>
         {
-            x.ConfigureConsumer<PaymentSuccessEventConsumer>(ctx);
+            x.ConfigureConsumer<InvoicePaymentSuccessEventConsumer>(ctx);
         });
     });
 
