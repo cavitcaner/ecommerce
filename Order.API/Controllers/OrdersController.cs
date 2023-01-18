@@ -13,7 +13,6 @@ namespace Order.API.Controllers
 
         public OrdersController(IOrderService orderService)
         {
-            _publishEndpoint = publishEndpoint;
             _orderService = orderService;
         }
 
