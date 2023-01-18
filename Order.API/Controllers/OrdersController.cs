@@ -14,6 +14,7 @@ namespace Order.API.Controllers
 
         public OrdersController(IPublishEndpoint publishEndpoint, IOrderService orderService)
         {
+            _publishEndpoint = publishEndpoint;
             _orderService = orderService;
         }
 
