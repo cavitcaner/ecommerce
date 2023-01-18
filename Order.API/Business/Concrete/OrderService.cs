@@ -1,6 +1,7 @@
 ﻿using Common.Order;
 using Common.Order.Dto;
 using Common.Payment;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Order.API.Database;
 
@@ -10,9 +11,11 @@ namespace Order.API.Business.Abstract
     {
         private readonly OrderDbContext _context;
 
-        public OrderService(OrderDbContext context)
+        private readonly IPublishEndpoint _publishEndpoint;
+        public OrderService(OrderDbContext context, IPublishEndpoint publishEndpoint)
         {
             _context = context;
+            _publishEndpoint = publishEndpoint;
         }
 
         public async Task<OrderCreatedEvent> CreateOrderAsync(OrderDto orderRequest)
@@ -39,7 +42,8 @@ namespace Order.API.Business.Abstract
             await _context.AddAsync(order);
             await _context.SaveChangesAsync();
 
-            return new OrderCreatedEvent()
+
+            var createdEvent = new OrderCreatedEvent()
             {
                 CustomerId = orderRequest.CustomerId,
                 CustomerEmail = orderRequest.CustomerEmail,
@@ -59,6 +63,10 @@ namespace Order.API.Business.Abstract
                     UnitPrice = x.UnitPrice
                 }).ToList()
             };
+
+            await _publishEndpoint.Publish(createdEvent);
+
+            return createdEvent;
         }
 
         public async Task<List<OrderResponseDto>> GetAllOrdersAsync()

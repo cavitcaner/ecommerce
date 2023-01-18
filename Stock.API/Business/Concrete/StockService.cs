@@ -1,6 +1,9 @@
-﻿using Common.Order;
+﻿using Common;
+using Common.Order;
 using Common.Payment;
+using Common.Stock;
 using Common.Stock.DTO;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Stock.API.Database;
 
@@ -9,10 +12,14 @@ namespace Stock.API.Business.Abstract
     public class StockService : IStockService
     {
         private readonly StockDbContext _context;
+        private readonly IPublishEndpoint _publishEndpoint;
+        private readonly ISendEndpointProvider _sendEndpointProvider;
 
-        public StockService(StockDbContext context)
+        public StockService(StockDbContext context, ISendEndpointProvider sendEndpointProvider, IPublishEndpoint publishEndpoint)
         {
             _context = context;
+            _sendEndpointProvider = sendEndpointProvider;
+            _publishEndpoint = publishEndpoint;
         }
 
         public async Task<bool> CheckAndDecreaseStockAsync(OrderCreatedEvent orderRequest)
@@ -44,7 +51,26 @@ namespace Stock.API.Business.Abstract
 
                 await _context.SaveChangesAsync();
 
+                var sendEndpoint = await _sendEndpointProvider.GetSendEndpoint(new Uri($"queue:{QueueConst.StockReservedEventQueueName}"));
+
+                await sendEndpoint.Send(new StockReservedEvent()
+                {
+                    CustomerEmail = orderRequest.CustomerEmail,
+                    CustomerId = orderRequest.CustomerId,
+                    OrderId = orderRequest.OrderId,
+                    OrderItems = orderRequest.orderItems,
+                    Payment = orderRequest.Payment
+                });
             }
+            else
+            {
+                await _publishEndpoint.Publish(new StockNotReservedEvent
+                {
+                    Message = "Yeterli stok bulunamadı.",
+                    OrderId = orderRequest.OrderId
+                });
+            }
+
 
             return allInStock;
         }
@@ -76,6 +102,12 @@ namespace Stock.API.Business.Abstract
             }
 
             await _context.SaveChangesAsync();
+
+            await _publishEndpoint.Publish(new StockReversedByMessageEvent
+            {
+                OrderId = message.OrderId,
+                Message = message.Message
+            });
         }
     }
 }

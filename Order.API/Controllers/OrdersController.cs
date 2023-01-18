@@ -10,9 +10,8 @@ namespace Order.API.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly IOrderService _orderService;
-        private readonly IPublishEndpoint _publishEndpoint;
 
-        public OrdersController(IPublishEndpoint publishEndpoint, IOrderService orderService)
+        public OrdersController(IOrderService orderService)
         {
             _publishEndpoint = publishEndpoint;
             _orderService = orderService;
@@ -22,8 +21,6 @@ namespace Order.API.Controllers
         public async Task<IActionResult> Orders(OrderDto orderRequest)
         {
             var orderCreatedEvent  = await _orderService.CreateOrderAsync(orderRequest);
-
-            await _publishEndpoint.Publish(orderCreatedEvent);
 
             return Accepted("/Orders", new { OrderId = orderCreatedEvent.OrderId});
         }
