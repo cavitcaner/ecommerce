@@ -16,6 +16,7 @@ namespace Order.API.Consumer
 
         public async Task Consume(ConsumeContext<PaymentSuccessEvent> context)
         {
+            Console.WriteLine("PaymentSuccessEventConsumer on Order Service");
             await _orderService.UpdateOrderStateAsync(context.Message.OrderId, OrderStatus.Success, "Sipariş başarılı bir şekilde oluşturulmuştur.");
         }
     }
